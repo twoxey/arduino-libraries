@@ -49,3 +49,11 @@ void servo_write_pulse_width_us(SG90_Servo s, uint32_t pulse_width_us) {
 void servo_write(SG90_Servo s, float angle) {
   servo_write_pulse_width_us(s, s.min_pulse_width_us + (angle / 180.0f) * (s.max_pulse_width_us - s.min_pulse_width_us));
 }
+
+// Arduino Servo.h interface
+struct Servo {
+  void attach(int pin) { s = servo_init(pin); }
+  void write(int angle) { servo_write(s, angle); }
+private:
+  SG90_Servo s;
+};
