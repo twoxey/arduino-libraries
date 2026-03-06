@@ -1,8 +1,9 @@
-typedef struct Encoder {
-  bool changed;
-  uint8_t state;
+typedef struct {
+  bool changed: 1;
+  bool skipped: 1;
+  uint8_t state: 4;
   int count;
-};
+} Encoder;
 
 void encoder_init(Encoder* e, int a_pin, int b_pin);
 bool encoder_update(Encoder* e, int a_state, int b_state);
@@ -42,7 +43,8 @@ bool encoder_update(Encoder* e, int a_state, int b_state) {
 
   uint8_t state = (e->state << 2 | current_state) & 0b1111;
   if      (state == 0b0010 || state == 0b1011 || state == 0b1101 || state == 0b0100) ++e->count;
-  else if (state == 0b0001 || state == 0b0111 || state == 0b1110 || state == 0b1100) --e->count;
+  else if (state == 0b0001 || state == 0b0111 || state == 0b1110 || state == 0b1000) --e->count;
+  else e->skipped = true;
   e->state = state;
   e->changed = true;
 
@@ -64,4 +66,3 @@ void encoder_init_() {
   attachInterrupt(digitalPinToInterrupt(a_pin), encoder_isr<e, a_pin, b_pin>, CHANGE);
   attachInterrupt(digitalPinToInterrupt(b_pin), encoder_isr<e, a_pin, b_pin>, CHANGE);
 }
-
